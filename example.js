@@ -6,6 +6,10 @@ window.onload = function() {
         draw: function(ctx, images) {
             ctx.fillStyle = '#0f0';
             ctx.fillRect(0, 0, 50, 50);
+        },
+        events: {
+        	progress: function(pct) { },
+        	loaded: function() {}
         }
     });
 }
