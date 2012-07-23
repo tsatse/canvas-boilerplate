@@ -1,7 +1,7 @@
 ﻿function sketch(setup) {
     var defaults = {
-        width: 500,
-        height: 500
+        width: window.innerWidth,
+        height: window.innerHeight
     };
     if (!Function.prototype.bind) {
       Function.prototype.bind = function (oThis) {
@@ -32,66 +32,55 @@
       };
     }    
 
-    var canvas;
-    if(setup.canvas) {
-        canvas = setup.canvas;
-    }
-    else {
-        canvas = document.createElement('canvas');
-        document.body.appendChild(canvas);
-    }
-    if(setup.width) {
-        canvas.width = setup.width;
-    }
-    else {
-        canvas.width = defaults.width;
-    }
-    if(setup.height) {
-        canvas.height = setup.height;
-    }
-    else {
-        canvas.height = defaults.height;
-    }
+    var canvas = setup.canvas || (function() { return document.body.appendChild(document.createElement('canvas')); }());
+
+    canvas.width = setup.width || defaults.width;
+    canvas.height = setup.height || defaults.height;
+
     var ctx = canvas.getContext('2d');
 
-    var phase = 0;
     var fps = 60;
     if(setup.fps) {
         fps = setup.fps;
     }
     var lastDraw = null;
-    var reqAnimFrame = window.requestAnimationFrame       || 
+    var reqAnimFrame = (window.requestAnimationFrame       || 
                        window.webkitRequestAnimationFrame || 
                        window.mozRequestAnimationFrame    || 
                        window.oRequestAnimationFrame      || 
                        window.msRequestAnimationFrame || 
                         function(callback) {
                             window.setTimeout(callback, 1000 / fps);
-                        };
+                        }).bind(window);
 
 
     var update = setup.update;
     var draw = setup.draw;
     var state;
-    if(setup.state) {
-        state = setup.state;
-    }
-    else {
-        state = {};
-    }
+    state = setup.state || {};
 
     if(setup.images) {
-        var imageNames = Object.keys(setup.images);
-        var images = {};
-        var loaded = 0;
-        for(var i = 0 ; i < imageNames.length ; i++) {
-            images[imageNames[i]] = new Image;
-            images[imageNames[i]].onload = function() {
+        var imageNames = Object.keys(setup.images),
+            images = {},
+            loaded = 0,
+            total = imageNames.length,
+            load = function() {
                 loaded += 1;
-                if(loaded === imageNames.length) {
+                if(loaded === total) {
+                    if(setup.events.loaded) {
+                        setup.events.loaded(images);
+                    }
                     reqAnimFrame(drawLoop);
+                } else {
+                    if(setup.events.progress) {
+                        setup.events.progress((loaded / total) * 100.0);
+                    }
                 }
             };
+        for(var i = 0 ; i < imageNames.length ; i++) {
+            images[imageNames[i]] = new Image;
+            images[imageNames[i]].onload = load;
+            images[imageNames[i]].onerror = load;
             images[imageNames[i]].src = 'images/' + imageNames[i] + '.png';
         }
     }
