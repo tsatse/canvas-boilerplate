@@ -68,7 +68,7 @@
                 loaded += 1;
                 if(loaded === total) {
                     if(setup.events.loaded) {
-                        setup.events.loaded();
+                        setup.events.loaded(images);
                     }
                     reqAnimFrame(drawLoop);
                 } else {
