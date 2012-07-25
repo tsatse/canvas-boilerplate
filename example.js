@@ -3,36 +3,59 @@ window.onload = function() {
         width: 200,
         height: 300,
         canvas: document.getElementById('canvas'),
-        state: {
-            pos: {x: 50, y: 0},
-            direction: {x: 0, y: 0}
+
+        resetState: function() {
+            this.pos = {x: 50, y: 0};
+            this.direction = {x: 0, y: 0};
         },
-        keydown: {
-            'F': function(state) {
-                state.direction.x = -1;
-            },
-            'G': function(state) {
-                state.direction.y = 1;
-            },
-            'H': function(state) {
-                state.direction.x = 1;
-            },
-            'T': function(state) {
-                state.direction.y = -1;
+
+        keydown: function(event) {
+            switch(event.keyCode) {
+            case 'W'.charCodeAt():
+            case 'Z'.charCodeAt():
+                this.direction.y = -1;
+                break;
+            case 'A'.charCodeAt():
+            case 'Q'.charCodeAt():
+                this.direction.x = -1;
+                break;
+            case 'S'.charCodeAt():
+                this.direction.y = 1;
+                break;
+            case 'D'.charCodeAt():
+                this.direction.x = 1;
+                break;
             }
         },
-        update: function(state) {
-            state.pos.x += state.direction.x;
-            state.pos.y += state.direction.y;
+
+        keyup: function(event) {
+            switch(event.keyCode) {
+            case 'W'.charCodeAt():
+            case 'Z'.charCodeAt():
+            case 'S'.charCodeAt():
+                this.direction.y = 0;
+                break;
+            case 'A'.charCodeAt():
+            case 'Q'.charCodeAt():
+            case 'D'.charCodeAt():
+                this.direction.x = 0;
+                break;
+            }
         },
-        draw: function(ctx, images, state) {
+
+        update: function() {
+            this.pos.x += this.direction.x;
+            this.pos.y += this.direction.y;
+        },
+
+        draw: function(ctx, images) {
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.fillStyle = '#0f0';
-            ctx.fillRect(state.pos.x, state.pos.y, 50, 50);
-            if(state.draw) {
-            	state.draw(ctx);
-            }
+            ctx.fillRect(this.pos.x, this.pos.y, 50, 50);
+            ctx.strokeStyle = '#040';
+            ctx.strokeRect(this.pos.x, this.pos.y, 50, 50);
         },
+
         events: {
         	progress: function(pct) { },
         	loaded: function(images) {}
