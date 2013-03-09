@@ -48,7 +48,9 @@ window.onload = function() {
             this.pos.y += this.direction.y;
         },
 
-        draw: function(ctx, images) {
+        draw: function() {
+            var ctx = this.ctx,
+                images = this.images;
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.fillStyle = '#0f0';
             ctx.fillRect(this.pos.x, this.pos.y, 50, 50);

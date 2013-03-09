@@ -42,8 +42,7 @@ function sketch(setup) {
         fps: 60,
         update: function() {},
         draw: function() {},
-        resetState: function(state) {return state;},
-        state: {},
+        resetState: function() {},
         events: {
             loaded: function() {},
             progress: function() {}
@@ -53,25 +52,27 @@ function sketch(setup) {
     var canvas = setup.canvas || (function() { return document.body.appendChild(document.createElement('canvas')); }());
     canvas.width = setup.width || defaults.width;
     canvas.height = setup.height || defaults.height;
-    var pointerInput = new PointerInput();
-    pointerInput.attach(canvas);
-    var pointerCallbacks = [
-        'down-left',
-        'down-middle',
-        'down-right',
-        'up-left',
-        'up-middle',
-        'up-right',
-        'up',
-        'down',
-        'drag-left',
-        'drag-middle',
-        'drag-right'
-    ];
-    for(var i = 0 ; i < pointerCallbacks.length ; i++) {
-        var callbackType = pointerCallbacks[i];
-        if(setup[callbackType]) {
-            pointerInput.addCallback(callbackType, setup[callbackType].bind(setup));
+    if(window.PointerInput) {
+        var pointerInput = new PointerInput();
+        pointerInput.attach(canvas);
+        var pointerCallbacks = [
+            'down-left',
+            'down-middle',
+            'down-right',
+            'up-left',
+            'up-middle',
+            'up-right',
+            'up',
+            'down',
+            'drag-left',
+            'drag-middle',
+            'drag-right'
+        ];
+        for(var i = 0 ; i < pointerCallbacks.length ; i++) {
+            var callbackType = pointerCallbacks[i];
+            if(setup[callbackType]) {
+                pointerInput.addCallback(callbackType, setup[callbackType].bind(setup));
+            }
         }
     }
     if(setup.keydown) {
@@ -84,22 +85,23 @@ function sketch(setup) {
     var update = setup.update || defaults.update;
     var draw = setup.draw || defaults.draw;
     var resetState = setup.resetState || defaults.resetState;
-    var state = resetState.call(setup, setup.state || defaults.state);
     var events = setup.events || defaults.events;
-    var ctx = canvas.getContext('2d');
+    setup.ctx = canvas.getContext('2d');
     var lastDraw = null;
+    var images = {};
 
 
     if(setup.images) {
         var imageNames = Object.keys(setup.images);
-        var images = {};
         var loaded = 0;
         var total = imageNames.length;
         var load = function() {
             loaded += 1;
             if(loaded === total) {
                 if(events.loaded) {
-                    events.loaded(images);
+                    resetState.call(setup);
+                    setup.images = images;
+                    events.loaded(setup.images);
                 }
                 reqAnimFrame(drawLoop);
             }
@@ -120,6 +122,7 @@ function sketch(setup) {
         }
     }
     else {
+        resetState.call(setup);
         reqAnimFrame(drawLoop);
     }
 
@@ -129,8 +132,8 @@ function sketch(setup) {
         }
         if(!time || time - lastDraw > 1000 / fps) {
             lastDraw = time;
-            update.call(setup, state);
-            draw.call(setup, ctx, images, state);
+            update.call(setup);
+            draw.call(setup);
         }
         reqAnimFrame(drawLoop);
     }
