@@ -5,7 +5,7 @@ This boiler-plate is handy to quickly test a game/demo/vfx idea.
 
 ## How to use it
 
-Load it in your page before your script and then call the sketch function with an object that describes your demo :
+Load it in your page before your script and then just call the sketch function with an object that describes your demo (no need to put that in an onload handler) :
 
     sketch({
         ...
@@ -15,41 +15,55 @@ Load it in your page before your script and then call the sketch function with a
         ...    
     })
 
-### scalar properties:
+The object you pass to the sketch function can contain any method that you wish, in addition to the following properties :
 
-**fps**: integer (default 60)  
+## Scalar properties:
+
+**canvas** canvas element *(required)*  
+The canvas DOM element for your main viewport. For example :  
+
+    ...
+    canvas: document.getElementById('my-canvas')
+    ...
+
+**fps** integer  
+(defaults to 60)  
 The framerate you want your demo to run at
 
-
-**width**: integer (default 1024)  
+**width** integer  
+(defaults to 1024)  
 The width of the main viewport
 
-
-**height**: integer (default 768)  
+**height** integer  
+(defaults to 768)  
 The height of the main viewport
 
+**images** object  
+Dictionary associating image names to image urls that should be loaded before starting the demo. For example :  
 
-**canvas**: canvas DOM element  
-The canvas DOM element for your main viewport
+    {
+        image1: 'http://url/to/image1.png',
+        image2: 'http://url/to/image2.png'
+    }
+
+These images will then be accessed as Image objects with :  
+
+    this.images[imageName]
 
 
-### callback properties:
+## Callback properties:
 
 **resetState**: function()  
 Called at the begining of the demo
 
-
 **keydown**: function(event)  
 Called whenever the keydown event is fired on the viewport
-
 
 **keyup**: function(event)  
 Called whenever the keyup event is fired on the viewport
 
-
 **update**: function()  
 Called before rendering to update your simulation
-
 
 **draw**: function()  
 The rendering function for your demo
