@@ -5,7 +5,7 @@ This boiler-plate is handy to quickly test a game/demo/vfx idea.
 
 ## How to use it
 
-Load it in your page before your script and then just call the sketch function with an object that describes your demo (no need to put that in an onload handler) :
+Load it in your page before your script and then just call the sketch function with an object that describes your demo :
 
     sketch({
         ...
