@@ -16,6 +16,9 @@
     "javascript",
     "2d"
   ],
+  "dependencies": {
+    "pointer-input": "git://github.com/tsatse/pointer-input.git"
+  },
   "author": "tsatse",
   "license": "MIT",
   "bugs": {
