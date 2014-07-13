@@ -1,0 +1,11 @@
+# top-most EditorConfig file
+root = true
+
+[*]
+indent_style = space
+
+[*.js]
+indent_size = 4
+
+[*.json]
+indent_size = 4

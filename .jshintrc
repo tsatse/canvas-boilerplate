@@ -1,0 +1,31 @@
+{
+    "asi": false,
+    "expr": false,
+    "curly": true,
+    "white": false,
+    "indent": false,
+    "undef": true,
+    "node": true,
+    "browser": true,
+    "gcl": true,
+    "evil": true,
+    "trailing": true,
+    "strict": false,
+    "noarg": true,
+    "newcap": true,
+    "immed": true,
+    "freeze": true,
+    "eqeqeq": true,
+    "camelcase": true,
+    "predef": [
+        "FormBot",
+        "socket",
+        "confirm",
+        "require",
+        "Buffer",
+        "define",
+        "prompt",
+        "unescape",
+        "Whammy"
+    ]
+}
