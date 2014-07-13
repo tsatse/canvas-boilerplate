@@ -1,0 +1,25 @@
+{
+  "name": "canvas-boilerplate",
+  "version": "0.0.0",
+  "description": "boilerplate code to quickly prototype canvas 2d games and demos",
+  "main": "canvas-boiler-plate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tsatse/canvas-boilerplate.git"
+  },
+  "keywords": [
+    "canvas",
+    "html5",
+    "javascript",
+    "2d"
+  ],
+  "author": "tsatse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tsatse/canvas-boilerplate/issues"
+  },
+  "homepage": "https://github.com/tsatse/canvas-boilerplate"
+}
