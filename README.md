@@ -26,19 +26,19 @@ The canvas DOM element for your main viewport. For example :
     canvas: document.getElementById('my-canvas')
     ...
 
-**fps** integer  
+**fps**:integer  
 (defaults to 60)  
 The framerate you want your demo to run at
 
-**width** integer  
+**width**:integer  
 (defaults to 1024)  
 The width of the main viewport
 
-**height** integer  
+**height**:integer  
 (defaults to 768)  
 The height of the main viewport
 
-**images** object  
+**images**:object  
 Dictionary associating image names to image urls that should be loaded before starting the demo. For example :  
 
     {
