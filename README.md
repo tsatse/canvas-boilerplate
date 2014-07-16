@@ -1,13 +1,13 @@
-# canvas-boiler-plate
+# canvas-boilerplate
 
 This boiler-plate is handy to quickly test a game/demo/vfx idea.
 
 
 ## How to use it
 
-Load it in your page before your script and then just call the sketch function with an object that describes your demo :
-
-    sketch({
+Load it in your page before your script or require it from a commonjs module, instanciate a boilerplate object and call the init method on it with an object that describes your demo :
+    var boilerplate = new CanvasBoilerplate();
+    boilerplate.init({
         ...
         propertyName: value
         propertyName: value
@@ -15,7 +15,7 @@ Load it in your page before your script and then just call the sketch function w
         ...    
     })
 
-The object you pass to the sketch function can contain any method that you wish, in addition to the following properties :
+The object you pass to the init method can contain any method that you wish, in addition to the following properties :
 
 ## Scalar properties:
 
@@ -68,3 +68,15 @@ Called before rendering to update your simulation
 **draw**: function()  
 The rendering function for your demo
 
+**pointer events**
+* down-left
+* down-middle
+* down-right
+* up-left
+* up-middle
+* up-right
+* up
+* down
+* drag-left
+* drag-middle
+* drag-right

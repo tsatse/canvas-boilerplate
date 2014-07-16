@@ -26,6 +26,6 @@
         "define",
         "prompt",
         "unescape",
-        "Whammy"
+        "requestAnimationFrame"
     ]
 }

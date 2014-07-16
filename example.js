@@ -1,5 +1,6 @@
 window.onload = function() {
-    sketch({
+    var cbp = new CanvasBoilerplate();
+    cbp.init({
         width: 200,
         height: 300,
         canvas: document.getElementById('canvas'),
@@ -56,11 +57,6 @@ window.onload = function() {
             ctx.fillRect(this.pos.x, this.pos.y, 50, 50);
             ctx.strokeStyle = '#040';
             ctx.strokeRect(this.pos.x, this.pos.y, 50, 50);
-        },
-
-        events: {
-        	progress: function(pct) { },
-        	loaded: function(images) {}
         }
     });
 }

@@ -1,6 +1,6 @@
 {
   "name": "canvas-boilerplate",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "boilerplate code to quickly prototype canvas 2d games and demos",
   "main": "canvas-boiler-plate.js",
   "scripts": {
@@ -17,7 +17,8 @@
     "2d"
   ],
   "dependencies": {
-    "pointer-input": "git://github.com/tsatse/pointer-input.git"
+    "pointer-input": "git://github.com/tsatse/pointer-input.git",
+    "raf": "git://github.com/chrisdickinson/raf.git"
   },
   "author": "tsatse",
   "license": "MIT",

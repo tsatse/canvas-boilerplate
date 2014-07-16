@@ -1,160 +1,172 @@
 ﻿(function(global) {
     "use strict";
 
-    if(!Function.prototype.bind) {
-        Function.prototype.bind = function(oThis) {
-            if(typeof this !== "function") {
-                // closest thing possible to the ECMAScript 5 internal IsCallable function
-                throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-            }
-
-            var aArgs = Array.prototype.slice.call(arguments, 1),
-                fToBind = this,
-                FNOP = function() {},
-                fBound = function() {
-                    try {
-                        return fToBind.apply(this instanceof FNOP ? this : oThis,
-                            aArgs.concat(Array.prototype.slice.call(arguments)));
-                    }
-                    catch(e) {
-                        //catching what javascriptcore considers an illegal use of instanceof
-                        return fToBind.apply(oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
-                    }
-                };
-
-            FNOP.prototype = this.prototype;
-            fBound.prototype = new FNOP();
-
-            return fBound;
-        };
-    }
-
     function definitionFunction(PointerInput) {
-        return function(setup) {
-            var reqAnimFrame = (window.requestAnimationFrame ||
-                window.webkitRequestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
-                window.oRequestAnimationFrame ||
-                window.msRequestAnimationFrame ||
-                function(callback) {
-                    window.setTimeout(callback, 1000 / fps);
-                }).bind(window);
-            var defaults = {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                fps: 60,
-                update: function() {},
-                draw: function() {},
-                resetState: function() {},
-                events: {
-                    loaded: function() {},
-                    progress: function() {}
+        var defaults = {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            fps: 60,
+            update: function() {},
+            draw: function() {},
+            resetState: function() {},
+            loaded: function() {},
+            progress: function() {}
+        };
+        var pointerCallbacks = [
+            'down-left',
+            'down-middle',
+            'down-right',
+            'up-left',
+            'up-middle',
+            'up-right',
+            'up',
+            'down',
+            'drag-left',
+            'drag-middle',
+            'drag-right'
+        ];
+
+        var CanvasBoilerplate = function(setup){
+            this.callbacks = {};
+            if(setup) {
+                this.init(setup);
+            }
+        };
+        CanvasBoilerplate.prototype = {
+            init: function init(setup) {
+                this.initSettings(setup);
+                this.registerCallbacks(setup);
+                this.initImages(setup);
+            },
+
+            initSettings: function(setup) {
+                this.canvas = setup.canvas || (function() {
+                    return document.body.appendChild(document.createElement('canvas'));
+                }());
+                this.canvas.width = setup.width || defaults.width;
+                this.canvas.height = setup.height || defaults.height;
+                this.fps = setup.fps || defaults.fps;
+                this.ctx = this.canvas.getContext('2d');
+                this.lastDraw = null;
+            },
+
+            drawLoop: function(time) {
+                if(this.lastDraw === null) {
+                    this.lastDraw = time;
                 }
-            };
+                if(!time || (time - this.lastDraw) > (1000 / this.fps)) {
+                    this.lastDraw = time;
+                    this.update();
+                    this.draw();
+                }
+                requestAnimationFrame(this.drawLoop.bind(this));
+            },
 
-            var canvas = setup.canvas || (function() {
-                return document.body.appendChild(document.createElement('canvas'));
-            }());
-            canvas.width = setup.width || defaults.width;
-            canvas.height = setup.height || defaults.height;
-            if(PointerInput) {
-                var pointerInput = new PointerInput();
-                pointerInput.attach(canvas);
-                var pointerCallbacks = [
-                    'down-left',
-                    'down-middle',
-                    'down-right',
-                    'up-left',
-                    'up-middle',
-                    'up-right',
-                    'up',
-                    'down',
-                    'drag-left',
-                    'drag-middle',
-                    'drag-right'
-                ];
+            registerCallbacks: function(setup) {
+                this.loaded = setup.loaded || defaults.loaded;
+                this.progress = setup.progress || defaults.progress;
+                this.update = setup.update || defaults.update;
+                this.draw = setup.draw || defaults.draw;
+                this.resetState = setup.resetState || defaults.resetState;
+                if(PointerInput) {
+                    this.pointerInput = new PointerInput();
+                    this.pointerInput.attach(this.canvas);
 
-                for(var i = 0; i < pointerCallbacks.length; i++) {
-                    var callbackType = pointerCallbacks[i];
-                    if(setup[callbackType]) {
-                        pointerInput.addCallback(callbackType, setup[callbackType].bind(setup));
+                    pointerCallbacks.forEach(function(callbackName) {
+                        if(setup[callbackName]) {
+                            this.callbacks[callbackName] = setup[callbackName].bind(this);
+                            this.pointerInput.addCallback(callbackName, this.callbacks[callbackName]);
+                        }
+                    }.bind(this));
+                }
+                else {
+                    console.warn('PointerInput not defined');
+                }
+                if(setup.keydown) {
+                    this.callbacks.keydown = setup.keydown.bind(this);
+                    document.addEventListener('keydown', this.callbacks.keydown);
+                }
+                if(setup.keyup) {
+                    this.callbacks.keyup = setup.keyup.bind(this);
+                    document.addEventListener('keyup', this.callbacks.keyup);
+                }
+            },
+
+            revokeCallbacks: function() {
+                this.loaded = defaults.loaded;
+                this.progress = defaults.progress;
+                this.update = defaults.update;
+                this.draw = defaults.draw;
+                this.resetState = defaults.resetState;
+                if(this.callbacks.keydown) {
+                    document.removeEventListener('keydown', this.callbacks.keydown);
+                }
+                if(this.callbacks.keyup) {
+                    document.removeEventListener('keyup', this.callbacks.keyup);
+                }
+                pointerCallbacks.forEach(function(callbackName) {
+                    if(this.callbacks[callbackName]) {
+                        this.pointerInput.removeCallback(callbackName, this.callbacks[callbackName]);
                     }
+                }.bind(this));
+            },
+
+            initImages: function(setup) {
+                this.images = {};
+                if(setup.images) {
+                    this.loadImages(setup.images, function() {
+                        this.resetState();
+                        if(this.loaded) {
+                            this.loaded(this.images);
+                        }
+                        requestAnimationFrame(this.drawLoop.bind(this));
+                    }.bind(this));
                 }
-            }
-            if(setup.keydown) {
-                document.addEventListener('keydown', setup.keydown.bind(setup));
-            }
-            if(setup.keyup) {
-                document.addEventListener('keyup', setup.keyup.bind(setup));
-            }
-            var fps = setup.fps || defaults.fps;
-            var update = setup.update || defaults.update;
-            var draw = setup.draw || defaults.draw;
-            var resetState = setup.resetState || defaults.resetState;
-            var events = setup.events || defaults.events;
-            setup.ctx = canvas.getContext('2d');
-            var lastDraw = null;
-            var images = {};
+                else {
+                    this.resetState();
+                    requestAnimationFrame(this.drawLoop.bind(this));
+                }
+            },
 
-
-            if(setup.images) {
-                var imageNames = Object.keys(setup.images);
+            loadImages: function loadImages(imagesPaths, done) {
                 var loaded = 0;
-                var total = imageNames.length;
+                var total = Object.keys(imagesPaths).length;
                 var load = function() {
                     loaded += 1;
                     if(loaded === total) {
-                        if(events.loaded) {
-                            resetState.call(setup);
-                            setup.images = images;
-                            events.loaded(setup.images);
-                        }
-                        reqAnimFrame(drawLoop);
+                        done();
                     }
                     else {
-                        if(events.progress) {
-                            events.progress((loaded / total) * 100.0);
+                        if(this.progress) {
+                            this.progress((loaded / total) * 100.0);
                         }
                     }
-                };
+                }.bind(this);
                 var error = function() {
                     console.error('error loading images');
-                };
-                for(var imageName in setup.images) {
-                    images[imageName] = new Image();
-                    images[imageName].onload = load;
-                    images[imageName].onerror = error;
-                    images[imageName].src = setup.images[imageName];
+                }.bind(this);
+                for(var imageName in imagesPaths) {
+                    this.images[imageName] = new Image();
+                    this.images[imageName].onload = load;
+                    this.images[imageName].onerror = error;
+                    this.images[imageName].src = imagesPaths[imageName];
                 }
-            }
-            else {
-                resetState.call(setup);
-                reqAnimFrame(drawLoop);
-            }
-
-            function drawLoop(time) {
-                if(lastDraw === null) {
-                    lastDraw = time;
-                }
-                if(!time || time - lastDraw > 1000 / fps) {
-                    lastDraw = time;
-                    update.call(setup);
-                    draw.call(setup);
-                }
-                reqAnimFrame(drawLoop);
             }
         };
+
+        return CanvasBoilerplate;
     }
 
     if (typeof define === 'function' && define.amd) {
         define(['pointer-input'], definitionFunction);
     }
     else if (typeof module === 'object' && module.exports) {
+        require('request-animation-frame');
         var pointerInput = require('pointer-input');
         module.exports = definitionFunction(pointerInput);
     }
     else {
-        global.yajefa = definitionFunction(global.pointerInput);
+        global.CanvasBoilerplate = definitionFunction(global.pointerInput);
     }
 
 })(this);
