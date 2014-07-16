@@ -161,7 +161,7 @@
         define(['pointer-input'], definitionFunction);
     }
     else if (typeof module === 'object' && module.exports) {
-        require('request-animation-frame');
+        require('raf');
         var pointerInput = require('pointer-input');
         module.exports = definitionFunction(pointerInput);
     }
