@@ -46,6 +46,10 @@
                 }());
                 this.canvas.width = setup.width || defaults.width;
                 this.canvas.height = setup.height || defaults.height;
+                if(PointerInput) {
+                    this.pointerInput = new PointerInput();
+                    this.pointerInput.attach(this.canvas);
+                }
                 this.fps = setup.fps || defaults.fps;
                 this.ctx = this.canvas.getContext('2d');
                 this.lastDraw = null;
@@ -69,10 +73,7 @@
                 this.update = setup.update || defaults.update;
                 this.draw = setup.draw || defaults.draw;
                 this.resetState = setup.resetState || defaults.resetState;
-                if(PointerInput) {
-                    this.pointerInput = new PointerInput();
-                    this.pointerInput.attach(this.canvas);
-
+                if(this.pointerInput) {
                     pointerCallbacks.forEach(function(callbackName) {
                         if(setup[callbackName]) {
                             this.callbacks[callbackName] = setup[callbackName].bind(this);

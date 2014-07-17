@@ -2,7 +2,7 @@
   "name": "canvas-boilerplate",
   "version": "0.1.0",
   "description": "boilerplate code to quickly prototype canvas 2d games and demos",
-  "main": "canvas-boilerplate.js",
+  "main": "src/core/canvas-boilerplate.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
