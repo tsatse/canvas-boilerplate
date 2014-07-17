@@ -34,6 +34,7 @@
         };
         CanvasBoilerplate.prototype = {
             init: function init(setup) {
+                this.images = {};
                 this.initSettings(setup);
                 this.registerCallbacks(setup);
                 this.initImages(setup);
@@ -112,7 +113,6 @@
             },
 
             initImages: function(setup) {
-                this.images = {};
                 if(setup.images) {
                     this.loadImages(setup.images, function() {
                         this.resetState();
